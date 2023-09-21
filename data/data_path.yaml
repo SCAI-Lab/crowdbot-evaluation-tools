@@ -1,2 +1,2 @@
-bagbase_dir: /hdd/data_qolo/crowd_qolo_recordings/
-outbase_dir: /hdd/data_qolo/crowdbot_data_analysis/
+bagbase_dir: /home/dwojcikie/Crowdbot_data/rosbags
+outbase_dir: /home/dwojcikie/Crowdbot_data

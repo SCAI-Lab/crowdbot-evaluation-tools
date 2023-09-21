@@ -348,6 +348,7 @@ def import_eval_res(
     path_metrics=None,
     control_metrics=None,
     travel_path_thres=5.0,
+    config=None,
 ):
     """Load generated results as pd.DataFrame"""
     if not crowd_metrics:
@@ -390,7 +391,7 @@ def import_eval_res(
         print("Reading results from {}".format(eval_dir))
 
         # new a CrowdBotDatabase() instance
-        eval_database = CrowdBotDatabase(classdir=eval_dir)
+        eval_database = CrowdBotDatabase(classdir=eval_dir, config=config)
 
         eval_dict = {'seq': eval_database.seqs}
         eval_dict.update(

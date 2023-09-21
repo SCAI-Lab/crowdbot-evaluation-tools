@@ -11,11 +11,11 @@ setup(
     author_email='yujie.he@epfl.ch',
     packages=[
         'qolo',
+        'qolo.core',
         'qolo.ros',
         'qolo.utils',
         'qolo.metrics',
         'qolo.external',
         'qolo.external.trajectory_smoothing',
-        'qolo.test',
     ],
 )
