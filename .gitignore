@@ -11,6 +11,7 @@ tmp
 *.pyc
 *.png
 *.mp4
+*.avi
 !example/*.png
 !notebooks/img/*.png
 

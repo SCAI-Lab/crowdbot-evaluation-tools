@@ -78,25 +78,46 @@ class CrowdBotDatabase(CrowdBotData):
 
         data_processed = classdir + "_processed"
         data_processed_dir = os.path.join(self.outbase_dir, data_processed)
+        if not os.path.exists(data_processed_dir):
+            os.makedirs(data_processed_dir)
 
         # lidars/
         self.lidar_dir = os.path.join(data_processed_dir, "lidars")
-
+        if not os.path.exists(self.lidar_dir):
+            os.makedirs(self.lidar_dir)
+        # lidars_nonground/
+        self.lidar_nonground_dir = os.path.join(data_processed_dir, "lidars_nonground")
+        if not os.path.exists(self.lidar_nonground_dir):
+            os.makedirs(self.lidar_nonground_dir)
         # alg_res/[detections/tracks]
         self.alg_res_dir = os.path.join(data_processed_dir, "alg_res")
+        if not os.path.exists(self.alg_res_dir):
+            os.makedirs(self.alg_res_dir)
         self.dets_dir = os.path.join(self.alg_res_dir, "detections")
+        if not os.path.exists(self.dets_dir):
+            os.makedirs(self.dets_dir)
         self.trks_dir = os.path.join(self.alg_res_dir, "tracks")
+        if not os.path.exists(self.trks_dir):
+            os.makedirs(self.trks_dir)
 
         # source_data/[tf_qolo/pose/twist/acc/timestamp] for qolo
         self.source_data_dir = os.path.join(data_processed_dir, "source_data")
+        if not os.path.exists(self.source_data_dir):
+            os.makedirs(self.source_data_dir)
 
         # ped_data/[traj/vel] for pedestrian
         self.ped_data_dir = os.path.join(data_processed_dir, "ped_data")
+        if not os.path.exists(self.ped_data_dir):
+            os.makedirs(self.ped_data_dir)
 
         self.metrics_dir = os.path.join(data_processed_dir, "metrics")
+        if not os.path.exists(self.metrics_dir):
+            os.makedirs(self.metrics_dir)
 
         # media/[img_o3d/videos]
         self.media_dir = os.path.join(data_processed_dir, "media")
+        if not os.path.exists(self.media_dir):
+            os.makedirs(self.media_dir)
 
         # filter sequence dir from self.lidar_dir (*_stamped.npy in the same folder)
         self.seqs = [
@@ -136,6 +157,10 @@ class CrowdBotDatabase(CrowdBotData):
         lidar = np.load(l_path) if os.path.isfile(l_path) else None
         lidar = lidar.T
 
+        l_nonground_path = os.path.join(self.lidar_nonground_dir, seq, fr)
+        lidar_nonground = np.load(l_nonground_path) if os.path.isfile(l_nonground_path) else None
+        lidar_nonground = lidar_nonground.T
+
         dnpy_all_path = os.path.join(self.dets_dir, seq + ".npy")
         tnpy_all_path = os.path.join(self.trks_dir, seq + ".npy")
 
@@ -151,7 +176,7 @@ class CrowdBotDatabase(CrowdBotData):
         else:
             trks = None
 
-        return lidar, dets, dets_conf, trks
+        return lidar, lidar_nonground, dets, dets_conf, trks
 
 
 # filter the files with specific extensions

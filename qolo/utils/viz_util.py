@@ -149,9 +149,9 @@ def boxes3d_to_corners3d(boxes3d, bottom_center=False):
     return corners.astype(np.float32)
 
 
-def filter_pointcloud_distance(in_cloud, dist=10.0, verbose=False):
+def filter_pointcloud_distance(in_cloud, dist=10.0, qolo_pos=[0.,0.], verbose=False):
     """filter detected pointcloud/pedestrain within the desired distance"""
-    r_square_within = (in_cloud[:, 0] ** 2 + in_cloud[:, 1] ** 2) < dist ** 2
+    r_square_within = ((in_cloud[:, 0]-qolo_pos[0]) ** 2 + (in_cloud[:, 1]-qolo_pos[1]) ** 2) < dist ** 2
     out_cloud = in_cloud[r_square_within, :]
     if verbose:
         print(
@@ -162,13 +162,13 @@ def filter_pointcloud_distance(in_cloud, dist=10.0, verbose=False):
     return out_cloud
 
 
-def filter_detection_tracking_res(in_boxes, dist=10.0, verbose=False):
+def filter_detection_tracking_res(in_boxes, dist=10.0, qolo_pos=[0.,0.], verbose=False):
     """
     Filter detected pointcloud/pedestrain within the desired distance
     Input:
         in_boxes: (N, 7) [x, y, z, dx, dy, dz, heading] in LiDAR coords
     """
-    r_square_within = (in_boxes[:, 0] ** 2 + in_boxes[:, 1] ** 2) < dist ** 2
+    r_square_within = ((in_boxes[:, 0]-qolo_pos[0]) ** 2 + (in_boxes[:, 1]-qolo_pos[1]) ** 2) < dist ** 2
     out_boxes = in_boxes[r_square_within, :]
     if verbose:
         print(

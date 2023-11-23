@@ -217,13 +217,13 @@ def delete_rgb_field(cloud_arr):
     return new_cloud_arr
 
 
-def get_xyzrgb_points(cloud_array, remove_nans=True, dtype=np.float):
+def get_xyzrgb_points(cloud_array, remove_nans=True, dtype=float):
     """Convert cloud array with 'rgb' field into separate xyz and rgb numpy arrays
 
     Args:
         cloud_array (numpy.ndarray): cloud array with 'rgb' field
         remove_nans (bool, optional): remove NaN in cloud array. Defaults to True.
-        dtype (type, optional): types of exported xyz and rgb data. Defaults to np.float.
+        dtype (type, optional): types of exported xyz and rgb data. Defaults to float.
 
     Returns:
         xyz (numpy.ndarray): xyz array of cloud points

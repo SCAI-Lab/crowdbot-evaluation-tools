@@ -67,6 +67,7 @@ def load_lidar(bag, topic, tf_buffer, target_frame="tf_qolo"):
             continue
 
         pc_xyz = ros_numpy.point_cloud2.pointcloud2_to_xyz_array(msg)
+        # pc_xyz = pc2.read_points(msg, skip_nans=True, field_names = ("x", "y", "z")))
         msgs.append(pc_xyz)
         ts.append(msg.header.stamp.to_sec())
         # ts.append(t.to_sec())
