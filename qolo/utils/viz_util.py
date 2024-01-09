@@ -47,6 +47,74 @@ bbox_lines = [
     [1, 4],
 ]
 
+def boxes2d_to_corners2d(boxes2d):
+    """
+    :param boxes2d: (N, 6) [x, y, dx, dy, sin_phi, cos_phi] in LiDAR coords, +x points to right (2 to 1),
+                    +y points front  (from 1 to 0),
+    :return: corners2d: (N, 4, 2)
+      3 -------- 0
+     /          /
+    2 -------- 1
+    """
+    boxes_num = boxes2d.shape[0]
+    dx, dy = boxes2d[:, 2], boxes2d[:, 3],
+    x_corners = np.array(
+        [
+            dx / 2.0,
+            dx / 2.0,
+            -dx / 2.0,
+            -dx / 2.0,
+        ],
+        dtype=np.float32,
+    ).T
+    y_corners = np.array(
+        [
+            dy / 2.0,
+            -dy / 2.0,
+            -dy / 2.0,
+            dy / 2.0,
+        ],
+        dtype=np.float32,
+    ).T
+    sinr, cosr = boxes2d[:,4], boxes2d[:,5]
+    tanr = sinr/cosr
+    ry = np.arctan2(tanr)
+
+    # counter-clockwisely rotate the frame around z by an angle ry
+    # note the transform is done by Vector x Matrix instead of Matrix x Vector,
+    # which means the Matrix need to be transposed when interpreted as a linear transform
+    rot_list = np.array(
+        [
+            [np.cos(ry), np.sin(ry),],
+            [-np.sin(ry), np.cos(ry),],
+        ]
+    )  # (2, 2, N)
+    R_list = np.transpose(rot_list, (2, 0, 1))  # (N, 2, 2)
+
+    temp_corners = np.concatenate(
+        (
+            x_corners.reshape(-1, 4, 1),
+            y_corners.reshape(-1, 4, 1),
+        ),
+        axis=2,
+    )  # (N, 4, 2)
+
+    rotated_corners = np.matmul(temp_corners, R_list)  # (N, 4, 2)
+    x_corners, y_corners, = (
+        rotated_corners[:, :, 0],
+        rotated_corners[:, :, 1],
+    )
+
+    x_loc, y_loc, = boxes2d[:, 0], boxes2d[:, 1],
+
+    x = x_loc.reshape(-1, 1) + x_corners.reshape(-1, 4)
+    y = y_loc.reshape(-1, 1) + y_corners.reshape(-1, 4)
+
+    corners = np.concatenate(
+        (x.reshape(-1, 4, 1), y.reshape(-1, 4, 1), z.reshape(-1, 4, 1)), axis=2
+    )
+
+    return corners.astype(np.float32)
 
 def boxes3d_to_corners3d(boxes3d, bottom_center=False):
     """

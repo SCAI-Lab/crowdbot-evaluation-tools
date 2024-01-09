@@ -66,7 +66,7 @@ class CrowdBotData(object):
 
 
 class CrowdBotDatabase(CrowdBotData):
-    def __init__(self, classdir, config=None):
+    def __init__(self, classdir, config=None,):
 
         if config is None:
             super(CrowdBotDatabase, self).__init__()
@@ -89,6 +89,10 @@ class CrowdBotDatabase(CrowdBotData):
         self.lidar_nonground_dir = os.path.join(data_processed_dir, "lidars_nonground")
         if not os.path.exists(self.lidar_nonground_dir):
             os.makedirs(self.lidar_nonground_dir)
+        # lidars_2D/
+        self.lidar_2D_dir = os.path.join(data_processed_dir, "lidars_2D")
+        if not os.path.exists(self.lidar_2D_dir):
+            os.makedirs(self.lidar_2D_dir)
         # alg_res/[detections/tracks]
         self.alg_res_dir = os.path.join(data_processed_dir, "alg_res")
         if not os.path.exists(self.alg_res_dir):
@@ -96,9 +100,15 @@ class CrowdBotDatabase(CrowdBotData):
         self.dets_dir = os.path.join(self.alg_res_dir, "detections")
         if not os.path.exists(self.dets_dir):
             os.makedirs(self.dets_dir)
+        self.dets_2D_dir = os.path.join(self.alg_res_dir, "detections_2D")
+        if not os.path.exists(self.dets_2D_dir):
+            os.makedirs(self.dets_2D_dir)
         self.trks_dir = os.path.join(self.alg_res_dir, "tracks")
         if not os.path.exists(self.trks_dir):
             os.makedirs(self.trks_dir)
+        self.trks_2D_dir = os.path.join(self.alg_res_dir, "tracks_2D")
+        if not os.path.exists(self.trks_2D_dir):
+            os.makedirs(self.trks_2D_dir)
 
         # source_data/[tf_qolo/pose/twist/acc/timestamp] for qolo
         self.source_data_dir = os.path.join(data_processed_dir, "source_data")
@@ -155,19 +165,30 @@ class CrowdBotDatabase(CrowdBotData):
 
         l_path = os.path.join(self.lidar_dir, seq, fr)
         lidar = np.load(l_path) if os.path.isfile(l_path) else None
-        lidar = lidar.T
+        if lidar is not None:
+            lidar = lidar.T
 
         l_nonground_path = os.path.join(self.lidar_nonground_dir, seq, fr)
         lidar_nonground = np.load(l_nonground_path) if os.path.isfile(l_nonground_path) else None
-        lidar_nonground = lidar_nonground.T
+        if lidar_nonground is not None:
+            lidar_nonground = lidar_nonground.T
+
+        l_2D_path = os.path.join(self.lidar_2D_dir, seq, fr)
+        lidar_2D = np.load(l_2D_path, allow_pickle=True).item() if os.path.isfile(l_2D_path) else None
 
         dnpy_all_path = os.path.join(self.dets_dir, seq + ".npy")
+        dnpy_2D_all_path = os.path.join(self.dets_2D_dir, seq + ".npy")
         tnpy_all_path = os.path.join(self.trks_dir, seq + ".npy")
 
         with open(dnpy_all_path, "rb") as dnpy_all:
             det_all = np.load(dnpy_all, allow_pickle=True).item()
         dets_ = det_all[fr_idx]
         dets, dets_conf = dets_[:, :-1], dets_[:, -1]
+
+        with open(dnpy_2D_all_path, "rb") as dnpy_2D_all:
+            det_2D_all = np.load(dnpy_2D_all, allow_pickle=True).item()
+        dets_2D_ = det_2D_all[fr_idx]
+        dets_2D, dets_2D_conf = dets_2D_[:, :-1], dets_2D_[:, -1]
 
         if os.path.exists(tnpy_all_path):
             with open(tnpy_all_path, "rb") as tnpy_all:
@@ -176,7 +197,7 @@ class CrowdBotDatabase(CrowdBotData):
         else:
             trks = None
 
-        return lidar, lidar_nonground, dets, dets_conf, trks
+        return lidar, lidar_nonground, lidar_2D, dets, dets_conf, trks, dets_2D, dets_2D_conf
 
 
 # filter the files with specific extensions
