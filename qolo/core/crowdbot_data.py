@@ -179,16 +179,23 @@ class CrowdBotDatabase(CrowdBotData):
         dnpy_all_path = os.path.join(self.dets_dir, seq + ".npy")
         dnpy_2D_all_path = os.path.join(self.dets_2D_dir, seq + ".npy")
         tnpy_all_path = os.path.join(self.trks_dir, seq + ".npy")
+        tnpy_2D_all_path = os.path.join(self.trks_2D_dir, seq + ".npy")
 
-        with open(dnpy_all_path, "rb") as dnpy_all:
-            det_all = np.load(dnpy_all, allow_pickle=True).item()
-        dets_ = det_all[fr_idx]
-        dets, dets_conf = dets_[:, :-1], dets_[:, -1]
+        if os.path.exists(dnpy_all_path):
+            with open(dnpy_all_path, "rb") as dnpy_all:
+                det_all = np.load(dnpy_all, allow_pickle=True).item()
+            dets_ = det_all[fr_idx]
+            dets, dets_conf = dets_[:, :-1], dets_[:, -1]
+        else:
+            dets, dets_conf = None, None
 
-        with open(dnpy_2D_all_path, "rb") as dnpy_2D_all:
-            det_2D_all = np.load(dnpy_2D_all, allow_pickle=True).item()
-        dets_2D_ = det_2D_all[fr_idx]
-        dets_2D, dets_2D_conf = dets_2D_[:, :-1], dets_2D_[:, -1]
+        if os.path.exists(dnpy_2D_all_path):
+            with open(dnpy_2D_all_path, "rb") as dnpy_2D_all:
+                det_2D_all = np.load(dnpy_2D_all, allow_pickle=True).item()
+            dets_2D_ = det_2D_all[fr_idx]
+            dets_2D, dets_2D_conf = dets_2D_[:, :-1], dets_2D_[:, -1]
+        else:
+            dets_2D, dets_2D_conf = None, None
 
         if os.path.exists(tnpy_all_path):
             with open(tnpy_all_path, "rb") as tnpy_all:
@@ -197,7 +204,14 @@ class CrowdBotDatabase(CrowdBotData):
         else:
             trks = None
 
-        return lidar, lidar_nonground, lidar_2D, dets, dets_conf, trks, dets_2D, dets_2D_conf
+        if os.path.exists(tnpy_2D_all_path):
+            with open(tnpy_2D_all_path, "rb") as tnpy_2D_all:
+                trk_2D_all = np.load(tnpy_2D_all, allow_pickle=True).item()
+            trks_2D = trk_2D_all[fr_idx]
+        else:
+            trks_2D = None
+
+        return lidar, lidar_nonground, lidar_2D, dets, dets_conf, trks, dets_2D, dets_2D_conf, trks_2D
 
 
 # filter the files with specific extensions

@@ -49,7 +49,7 @@ bbox_lines = [
 
 def boxes2d_to_corners2d(boxes2d):
     """
-    :param boxes2d: (N, 6) [x, y, dx, dy, sin_phi, cos_phi] in LiDAR coords, +x points to right (2 to 1),
+    :param boxes2d: (N, 6) [x, y, dx, dy, heading] in LiDAR coords, +x points to right (2 to 1),
                     +y points front  (from 1 to 0),
     :return: corners2d: (N, 4, 2)
       3 -------- 0
@@ -76,9 +76,8 @@ def boxes2d_to_corners2d(boxes2d):
         ],
         dtype=np.float32,
     ).T
-    sinr, cosr = boxes2d[:,4], boxes2d[:,5]
-    tanr = sinr/cosr
-    ry = np.arctan2(tanr)
+
+    ry = boxes2d[:, 4]
 
     # counter-clockwisely rotate the frame around z by an angle ry
     # note the transform is done by Vector x Matrix instead of Matrix x Vector,
@@ -111,7 +110,7 @@ def boxes2d_to_corners2d(boxes2d):
     y = y_loc.reshape(-1, 1) + y_corners.reshape(-1, 4)
 
     corners = np.concatenate(
-        (x.reshape(-1, 4, 1), y.reshape(-1, 4, 1), z.reshape(-1, 4, 1)), axis=2
+        (x.reshape(-1, 4, 1), y.reshape(-1, 4, 1),), axis=2
     )
 
     return corners.astype(np.float32)
