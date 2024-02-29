@@ -133,7 +133,7 @@ class CrowdBotDatabase(CrowdBotData):
         self.seqs = [
             f
             for f in os.listdir(self.lidar_dir)
-            if os.path.isdir(os.path.join(self.lidar_dir, f))
+            if (os.path.isdir(os.path.join(self.lidar_dir, f)) and f[0] != '.')
         ]
         self.seqs.sort()
         self.frames = []
@@ -217,6 +217,13 @@ class CrowdBotDatabase(CrowdBotData):
 # filter the files with specific extensions
 def bag_file_filter(f):
     if f[-4:] in [".bag"]:
+        return True
+    else:
+        return False
+    
+# filter the files with specific extensions
+def processed_Crowdbot_bag_file_filter(f):
+    if f[-23:] in ["filtered_lidar_odom.bag"]:
         return True
     else:
         return False
