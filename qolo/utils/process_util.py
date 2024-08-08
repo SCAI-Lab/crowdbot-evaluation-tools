@@ -17,6 +17,7 @@ The module provides utility functions to convert timestamp into second, interpol
 import sys
 
 import numpy as np
+from scipy.interpolate import UnivariateSpline
 
 import scipy.signal as signal
 from scipy import interpolate
@@ -90,7 +91,7 @@ def compute_motion_derivative(motion_stamped_dict, subset=None):
 
 
 def smooth1d(
-    data, filter='savgol', window=9, polyorder=1, check_thres=False, thres=[-1.2, 1.5]
+    data, filter='savgol', window=9, polyorder=1, check_thres=False, thres=[-1.2, 1.5], mode='interp'
 ):
     """
     Smooth datapoints with Savitzky-Golay or moving-average
@@ -120,7 +121,7 @@ def smooth1d(
 
     if filter == 'savgol':
         data_smoothed = signal.savgol_filter(
-            data, window_length=window, polyorder=polyorder
+            data, window_length=window, polyorder=polyorder, mode=mode
         )
     elif filter == 'moving_average':
         ma_window = np.ones(window) / window
